@@ -5,19 +5,19 @@ import { Field, Input, Text, Button, Link } from "rimble-ui";
 
 const snarkjs = require("snarkjs");
 
-const getSolidityProofArray = (proof: any) => {
-	let proofList = [
-		proof["pi_a"][0],
-		proof["pi_a"][1],
-		proof["pi_b"][0][1],
-		proof["pi_b"][0][0],
-		proof["pi_b"][1][1],
-		proof["pi_b"][1][0],
-		proof["pi_c"][0],
-		proof["pi_c"][1],
-	];
-	return proofList;
-};
+// const getSolidityProofArray = (proof: any) => {
+// 	let proofList = [
+// 		proof["pi_a"][0],
+// 		proof["pi_a"][1],
+// 		proof["pi_b"][0][1],
+// 		proof["pi_b"][0][0],
+// 		proof["pi_b"][1][1],
+// 		proof["pi_b"][1][0],
+// 		proof["pi_c"][0],
+// 		proof["pi_c"][1],
+// 	];
+// 	return proofList;
+// };
 
 const makeProof = async (_proofInput: any, _wasm: string, _zkey: string) => {
 	const { proof, publicSignals } = await snarkjs.groth16.fullProve(_proofInput, _wasm, _zkey);
@@ -34,23 +34,23 @@ const verifyProof = async (_verificationkey: string, signals: any, proof: any) =
 };
 
 function App() {
-	const [a, setA] = useState("3");
-	const [b, setB] = useState("11");
+	const [latitude, setA] = useState("3");
+	const [longitude, setB] = useState("11");
 
 	const [proof, setProof] = useState("");
 	const [signals, setSignals] = useState("");
 	const [isValid, setIsValid] = useState(false);
 
-	let wasmFile = "http://localhost:8000/circuit.wasm";
-	let zkeyFile = "http://localhost:8000/circuit_final.zkey";
-	let verificationKey = "http://localhost:8000/verification_key.json";
+	let wasmFile = "http://zk-maps-ronerlih-zkmaps.vercel.app/AtEthDenver.wasm";
+	let zkeyFile = "http://zk-maps-ronerlih-zkmaps.vercel.app/circuit_final.zkey";
+	let verificationKey = "http://zk-maps-ronerlih-zkmaps.vercel.app/verification_key_0001.json";
 
 	const runProofs = () => {
-		console.log(b.length);
-		if (a.length == 0 || b.length == 0) {
+		console.log(longitude.length);
+		if (latitude.length == 0 || longitude.length == 0) {
 			return;
 		}
-		let proofInput = { a, b };
+		let proofInput = { latitude: parseInt(latitude), longitude:parseInt(longitude) };
 		console.log(proofInput);
 
 		makeProof(proofInput, wasmFile, zkeyFile).then(({ proof: _proof, publicSignals: _signals }) => {
@@ -78,10 +78,10 @@ function App() {
 				</Text>
 				<pre>Witness Inputs</pre>
 				<Field label="Input a:">
-					<Input type="text" required={true} value={a} onChange={changeA} placeholder="e.g. 3" />
+					<Input type="text" required={true} value={latitude} onChange={changeA} placeholder="e.g. 3" />
 				</Field>
 				<Field label="Input b:">
-					<Input type="text" required={true} value={b} onChange={changeB} placeholder="e.g. 11" />
+					<Input type="text" required={true} value={longitude} onChange={changeB} placeholder="e.g. 11" />
 				</Field>
 				<Button.Outline onClick={runProofs}>Generate Proof</Button.Outline>
 				Proof: <Text width={1 / 2}>{proof}</Text>
