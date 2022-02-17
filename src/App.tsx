@@ -28,37 +28,40 @@ const verifyProof = async (_verificationkey: string, signals: any, proof: any) =
 	const vkey = await fetch(_verificationkey).then(function (res) {
 		return res.json();
 	});
-
+console.log({vkey})
+console.log({signals})
+console.log({proof})
 	const res = await snarkjs.groth16.verify(vkey, signals, proof);
 	return res;
 };
 
 function App() {
-	const [latitude, setA] = useState("3");
-	const [longitude, setB] = useState("11");
+	const [latitude, setA] = useState("12973547807205025");
+	const [longitude, setB] = useState("7500977777251771");
 
 	const [proof, setProof] = useState("");
 	const [signals, setSignals] = useState("");
 	const [isValid, setIsValid] = useState(false);
 
-	let wasmFile = "http://zk-maps-ronerlih-zkmaps.vercel.app/AtEthDenver.wasm";
-	let zkeyFile = "http://zk-maps-ronerlih-zkmaps.vercel.app/circuit_final.zkey";
-	let verificationKey = "http://zk-maps-ronerlih-zkmaps.vercel.app/verification_key_0001.json";
+	let wasmFile = "http://localhost:8000/AtEthDenver.wasm";
+	let zkeyFile = "http://localhost:8000/AtEthDenver_0001.zkey";
+	let verificationKey = "http://localhost:8000/verification_key.json";
 
 	const runProofs = () => {
 		console.log(longitude.length);
 		if (latitude.length == 0 || longitude.length == 0) {
 			return;
 		}
-		let proofInput = { latitude: parseInt(latitude), longitude:parseInt(longitude) };
+		let proofInput = { latitude, longitude };
 		console.log(proofInput);
 
 		makeProof(proofInput, wasmFile, zkeyFile).then(({ proof: _proof, publicSignals: _signals }) => {
 			setProof(JSON.stringify(_proof, null, 2));
 			setSignals(JSON.stringify(_signals, null, 2));
-			verifyProof(verificationKey, _signals, _proof).then((_isValid) => {
-				setIsValid(_isValid);
-			});
+      console.log(_proof)
+			// verifyProof(verificationKey, _signals, _proof).then((_isValid) => {
+			// 	setIsValid(_isValid);
+			// });
 		});
 	};
 
